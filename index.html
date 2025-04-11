@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecuación Cuadrática - Método de Po Shen Loh</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6994d0;
+            --background-color: #f8f9fa;
+            --panel-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --accent-color: #3d5a80;
+            --highlight-red: #dc2626;
+            --highlight-blue: #2563eb;
+            --highlight-green: #16a34a;
+            --highlight-purple: #7c3aed;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .title-panel {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .layout {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .sidebar {
+            flex: 0 0 340px;
+            padding: 25px;
+            background-color: var(--panel-color);
+            border-radius: 10px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+        
+        .method-explanation {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 25px;
+        }
+        
+        .method-explanation h3 {
+            color: var(--highlight-blue);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+        
+        .method-equations {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f0f4f8;
+            border-radius: 8px;
+            border-left: 4px solid var(--highlight-blue);
+        }
+        
+        .method-equations h4 {
+            color: var(--highlight-blue);
+            margin-bottom: 10px;
+        }
+        
+        .equations-list p {
+            margin: 8px 0;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--highlight-green);
+        }
+        
+        .input-section h4 {
+            color: var(--highlight-green);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .explanation-image {
+            width: 100%;
+            margin: 0 auto;
+            display: block;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: white;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .explanation-image:hover {
+            transform: scale(1.02);
+        }
+
+        .main-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 25px;
+            background-color: var(--panel-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--accent-color);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        h2, h3, h4 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .plot-container {
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                flex: 0 0 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-panel">
+            <h1>Ecuación Cuadrática - Método de Po Shen Loh</h1>
+        </div>
+        
+        <div class="layout">
+            <div class="sidebar">
+                <div class="method-explanation">
+                    <h3>Método de Po-Shen Loh</h3>
+                    <div class="explanation-image">
+                        <svg width="100%" viewBox="0 0 480 400">
+                            <!-- Ejes de coordenadas -->
+                            <line x1="80" y1="200" x2="400" y2="200" stroke="blue" stroke-width="2"/>
+                            <line x1="240" y1="50" x2="240" y2="350" stroke="blue" stroke-width="2"/>
+                            
+                            <!-- Flechas de los ejes -->
+                            <polygon points="400,200 390,195 390,205" fill="blue"/>
+                            <polygon points="240,50 235,60 245,60" fill="blue"/>
+                            <polygon points="240,350 235,340 245,340" fill="blue"/>
+                            <polygon points="80,200 90,195 90,205" fill="blue"/>
+                            
+                            <!-- Etiquetas de los ejes -->
+                            <text x="410" y="200" text-anchor="start" font-family="Arial" font-size="20" fill="blue">x</text>
+                            <text x="240" y="40" text-anchor="middle" font-family="Arial" font-size="20" fill="blue">y</text>
+                            
+                            <!-- Parábola -->
+                            <path d="M 100 300 Q 240 100 380 300" stroke="green" stroke-width="3" fill="none"/>
+                            
+                            <!-- Punto vértice (m) -->
+                            <circle cx="240" cy="200" r="5" fill="blue"/>
+                            <text x="240" y="220" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="blue">m</text>
+                            
+                            <!-- Puntos x₁ y x₂ -->
+                            <circle cx="160" cy="200" r="5" fill="blue"/>
+                            <text x="160" y="220" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="blue">x₁</text>
+                            
+                            <circle cx="320" cy="200" r="5" fill="blue"/>
+                            <text x="320" y="220" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="blue">x₂</text>
+                            
+                            <!-- Valores de u con llaves -->
+                            <!-- Primera llave u (izquierda) -->
+                            <path d="M 200 180 C 200 175, 195 175, 190 175 L 170 175 C 165 175, 160 175, 160 170" stroke="red" stroke-width="2" fill="none"/>
+                            <text x="180" y="165" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="red">u</text>
+                            
+                            <!-- Segunda llave u (derecha) -->
+                            <path d="M 280 180 C 280 175, 285 175, 290 175 L 310 175 C 315 175, 320 175, 320 170" stroke="red" stroke-width="2" fill="none"/>
+                            <text x="300" y="165" text-anchor="middle" font-family="Arial" font-size="20" font-weight="bold" fill="red">u</text>
+                            
+                            <!-- Ecuaciones a un lado - Opcional, solo si hay espacio -->
+                            <text x="40" y="85" text-anchor="start" font-family="Arial" font-size="16" fill="blue">x₁ = m−u</text>
+                            <text x="40" y="110" text-anchor="start" font-family="Arial" font-size="16" fill="blue">x₂ = m+u</text>
+                            <text x="40" y="135" text-anchor="start" font-family="Arial" font-size="16" fill="blue">m = -b/2</text>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="form-group input-section">
+                    <h4>Coeficientes de la ecuación: \(Ax^2 + Bx + C = 0\)</h4>
+                    <div class="row">
+                        <div class="col">
+                            <label for="Ab">A:</label>
+                            <input type="number" id="Ab" min="-50" max="50" value="3" step="0.1">
+                        </div>
+                        <div class="col">
+                            <label for="Bb">B:</label>
+                            <input type="number" id="Bb" min="-50" max="50" value="-3" step="0.1">
+                        </div>
+                        <div class="col">
+                            <label for="Cb">C:</label>
+                            <input type="number" id="Cb" min="-50" max="50" value="-6" step="0.1">
+                        </div>
+                    </div>
+                </div>
+                <div class="method-equations">
+                    <h4>Ecuaciones del método:</h4>
+                    <div class="equations-list">
+                        <p>\(x^2 + bx + c = 0\)</p>
+                        <p>\(x_1 + x_2 = -b\)</p>
+                        <p>\(x_1 \cdot x_2 = c\)</p>
+                        <p>\(m = \frac{x_1 + x_2}{2} = \frac{-b}{2}\)</p>
+                        <p>\(x_1 = m - u\)</p>
+                        <p>\(x_2 = m + u\)</p>
+                        <p>\((m-u)(m+u) = c\)</p>
+                        <p>\(m^2 - u^2 = c\)</p>
+                        <p>\(u = \sqrt{m^2 - c}\)</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="xo">Evaluar en \(x= x_0\):</label>
+                    <input type="number" id="xo" min="-50" max="50" value="0" step="0.1">
+                    <div class="help-text">
+                        para calcular \(f(x_0)= A(x_0)^2+B(x_0)+C\)
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ao">Decimales:</label>
+                    <input type="number" id="ao" min="0" max="10" value="3">
+                </div>
+                
+                <div class="form-group">
+                    <label>Rango para la gráfica:</label>
+                    <div class="row">
+                        <div class="col">
+                            <label for="intva">Mínimo x:</label>
+                            <input type="number" id="intva" min="-100" max="100" value="-4" step="0.5">
+                        </div>
+                        <div class="col">
+                            <label for="intvb">Máximo x:</label>
+                            <input type="number" id="intvb" min="-100" max="100" value="5" step="0.5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="main-panel">
+                <div class="section">
+                    <div id="Procesoaj2"></div>
+                    <div id="Procesoabj2"></div>
+                    <div id="Procesoacj2"></div>
+                </div>
+                
+                <div class="section">
+                    <div id="Procesoaj0"></div>
+                </div>
+                
+                <div class="section">
+                    <div id="Procesoaj1"></div>
+                </div>
+                
+                <div class="plot-container">
+                    <canvas id="distPlot" width="800" height="400"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funciones auxiliares
+        function signob(x) {
+            if (x < 0) {
+                return " - ";
+            } else {
+                return " + ";
+            }
+        }
+
+        function roundPrecise(number, decimals) {
+            const factor = Math.pow(10, decimals);
+            return Math.round((number + Number.EPSILON) * factor) / factor;
+        }
+
+        // Función para dibujar la gráfica
+        function drawPlot() {
+            const canvas = document.getElementById('distPlot');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const ja = parseFloat(document.getElementById('intva').value);
+            const jb = parseFloat(document.getElementById('intvb').value);
+            const A = parseFloat(document.getElementById('Ab').value);
+            const B = parseFloat(document.getElementById('Bb').value);
+            const C = parseFloat(document.getElementById('Cb').value);
+            
+            // Calcular valores importantes
+            const D = B*B - 4*A*C;
+            const Vpx = -B/(2*A);
+            const Vpy = -D/(4*A);
+            
+            // Función cuadrática
+            function f(x) {
+                return A*x*x + B*x + C;
+            }
+            
+            // Encontrar valores mínimos y máximos para escalar
+            let minY = Number.POSITIVE_INFINITY;
+            let maxY = Number.NEGATIVE_INFINITY;
+            const step = (jb - ja) / 500; // Más puntos para mejor precisión
+            const points = [];
+            
+            for (let x = ja; x <= jb; x += step) {
+                const y = f(x);
+                points.push({x, y});
+                minY = Math.min(minY, y);
+                maxY = Math.max(maxY, y);
+            }
+            
+            // Añadir margen para la visualización
+            const yRange = maxY - minY;
+            minY -= yRange * 0.1;
+            maxY += yRange * 0.1;
+            
+            // Escala y traducción
+            const width = canvas.width;
+            const height = canvas.height;
+            const scaleX = width / (jb - ja + 2);
+            const scaleY = height / (maxY - minY);
+            const translateX = -ja + 1;
+            const translateY = maxY;
+            
+            // Dibujar fondo
+            ctx.fillStyle = '#f8f8f8';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Dibujar cuadrícula
+            ctx.beginPath();
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 0.5;
+            
+            // Líneas verticales
+            for (let x = Math.floor(ja); x <= Math.ceil(jb); x++) {
+                if (x === 0) continue; // Saltamos el eje Y que se dibujará después
+                const xPos = (x + translateX) * scaleX;
+                ctx.moveTo(xPos, 0);
+                ctx.lineTo(xPos, height);
+                
+                // Etiquetas del eje X
+                ctx.fillStyle = '#666';
+                ctx.font = '10px Arial';
+                ctx.fillText(x.toString(), xPos - 5, height - 5);
+            }
+            
+            // Líneas horizontales
+            for (let y = Math.floor(minY / 5) * 5; y <= Math.ceil(maxY / 5) * 5; y += 5) {
+                if (y === 0) continue; // Saltamos el eje X que se dibujará después
+                const yPos = height - (y - minY) * scaleY;
+                ctx.moveTo(0, yPos);
+                ctx.lineTo(width, yPos);
+                
+                // Etiquetas del eje Y
+                ctx.fillStyle = '#666';
+                ctx.font = '10px Arial';
+                ctx.fillText(y.toString(), 5, yPos + 3);
+            }
+            
+            ctx.stroke();
+            
+            // Dibujar ejes
+            ctx.beginPath();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1.5;
+            
+            // Eje X
+            const yAxisPos = height - (0 - minY) * scaleY;
+            if (yAxisPos >= 0 && yAxisPos <= height) {
+                ctx.moveTo(0, yAxisPos);
+                ctx.lineTo(width, yAxisPos);
+            }
+            
+            // Eje Y
+            const xAxisPos = (0 + translateX) * scaleX;
+            if (xAxisPos >= 0 && xAxisPos <= width) {
+                ctx.moveTo(xAxisPos, 0);
+                ctx.lineTo(xAxisPos, height);
+            }
+            
+            ctx.stroke();
+            
+            // Dibujar la parábola
+            ctx.beginPath();
+            ctx.strokeStyle = '#4a6fa5';
+            ctx.lineWidth = 2.5;
+            
+            for (let i = 0; i < points.length; i++) {
+                const x = (points[i].x + translateX) * scaleX;
+                const y = height - (points[i].y - minY) * scaleY;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            
+            ctx.stroke();
+            
+            // Dibujar el vértice
+            const vertexX = (Vpx + translateX) * scaleX;
+            const vertexY = height - (Vpy - minY) * scaleY;
+            
+            ctx.beginPath();
+            ctx.fillStyle = '#e63946';
+            ctx.arc(vertexX, vertexY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Etiqueta del vértice
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.fillText(`V(${roundPrecise(Vpx, 2)}, ${roundPrecise(Vpy, 2)})`, vertexX + 8, vertexY - 8);
+            
+            // Si D >= 0, dibujar las raíces
+            if (D >= 0) {
+                const r1 = (-B + Math.sqrt(D)) / (2 * A);
+                const r2 = (-B - Math.sqrt(D)) / (2 * A);
+                
+                // Primera raíz
+                const root1X = (r1 + translateX) * scaleX;
+                const root1Y = height - (0 - minY) * scaleY;
+                
+                ctx.beginPath();
+                ctx.fillStyle = '#2a9d8f';
+                ctx.arc(root1X, root1Y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.fillText(`x₁=${roundPrecise(r1, 2)}`, root1X + 8, root1Y - 8);
+                
+                // Segunda raíz
+                const root2X = (r2 + translateX) * scaleX;
+                const root2Y = height - (0 - minY) * scaleY;
+                
+                ctx.beginPath();
+                ctx.fillStyle = '#2a9d8f';
+                ctx.arc(root2X, root2Y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.fillText(`x₂=${roundPrecise(r2, 2)}`, root2X + 8, root2Y - 8);
+            }
+        }
+        
+        // Renderizar todos los componentes
+        function renderAll() {
+            const A = parseFloat(document.getElementById('Ab').value);
+            const B = parseFloat(document.getElementById('Bb').value);
+            const C = parseFloat(document.getElementById('Cb').value);
+            const xo = parseFloat(document.getElementById('xo').value);
+            const ao = parseInt(document.getElementById('ao').value);
+            
+            // Calcular valores importantes con alta precisión
+            const D = B*B - 4*A*C;
+            const d1 = B*B;
+            const d2 = -4*A*C;
+            
+            // Evaluar la función en x0 con alta precisión
+            const yj0 = A * Math.pow(xo, 2) + B * xo + C;
+            
+            // Procesoaj0 - Discriminante y evaluación
+            document.getElementById('Procesoaj0').innerHTML = `
+                <h3>Discriminante: ${roundPrecise(D, ao)}</h3>
+                <h3>\\(D=B^2-4AC\\) ; \\(D=(${roundPrecise(B, ao)})^{2}-4(${roundPrecise(A, ao)})(${roundPrecise(C, ao)}) = ${roundPrecise(d1, ao)}${signob(d2)}${Math.abs(roundPrecise(d2, ao))}\\)</h3>
+                <h3>Evaluación en \\(x_0=${xo}\\):</h3>
+                <h3>\\(f(${xo})= ${roundPrecise(A, ao)}(${xo})^2 ${signob(B)}${Math.abs(roundPrecise(B, ao))}(${xo}) ${signob(C)} ${Math.abs(roundPrecise(C, ao))} = ${roundPrecise(yj0, ao)}\\)</h3>
+            `;
+            
+            // Procesoaj2 - Ecuación original
+            document.getElementById('Procesoaj2').innerHTML = `
+                <h2>Ecuación original: ${roundPrecise(A, ao)}\\(x^2\\) ${signob(B)}${Math.abs(roundPrecise(B, ao))}\\(x\\) ${signob(C)} ${Math.abs(roundPrecise(C, ao))} = 0</h2>
+            `;
+            
+            // Procesoabj2 - Ecuación normalizada (con fracciones)
+            document.getElementById('Procesoabj2').innerHTML = `
+                <h3>Ecuación normalizada: \\(x^2\\) ${signob(B/A)}\\(\\dfrac{${Math.abs(roundPrecise(B, ao))}}{${Math.abs(roundPrecise(A, ao))}}x\\) ${signob(C/A)} \\(\\dfrac{${Math.abs(roundPrecise(C, ao))}}{${Math.abs(roundPrecise(A, ao))}}\\) = 0</h3>
+            `;
+            
+            // Procesoacj2 - Ecuación normalizada (con decimales)
+            document.getElementById('Procesoacj2').innerHTML = `
+                <h3>Forma simplificada: \\(x^2\\) ${signob(B/A)}${roundPrecise(Math.abs(B/A), ao)}\\(x\\) ${signob(C/A)} ${roundPrecise(Math.abs(C/A), ao)} = 0</h3>
+            `;
+            
+            // Procesoaj1 - Solución por método de Po Shen Loh
+            let procesoaj1Content = '';
+            if (D >= 0) {
+                const Dr = Math.sqrt(D);
+                const a1 = B/(2*A);
+                const r1 = Math.abs(Dr/(2*A));
+                
+                const alf = roundPrecise(a1 - r1, ao);
+                const bet = roundPrecise(a1 + r1, ao);
+                
+                const alf2 = `\\left(\\dfrac{${roundPrecise(B, ao)}}{${roundPrecise(2*A, ao)}}-\\dfrac{${roundPrecise(Math.sqrt(D), ao)}}{${roundPrecise(Math.abs(2*A), ao)}}\\right)`;
+                const bet2 = `\\left(\\dfrac{${roundPrecise(B, ao)}}{${roundPrecise(2*A, ao)}}+\\dfrac{${roundPrecise(Math.sqrt(D), ao)}}{${roundPrecise(Math.abs(2*A), ao)}}\\right)`;
+                
+                const Mensaje3 = `\\(\\left(x ${signob(alf)}${Math.abs(roundPrecise(alf, ao))}\\right)\\) \\(\\cdot\\) \\(\\left(x ${signob(bet)}${Math.abs(roundPrecise(bet, ao))}\\right)\\) = 0`;
+                
+                procesoaj1Content = `
+                    <h2>Soluciones reales:</h2>
+                    <h3>Factorización: ${Mensaje3}</h3>
+                    <h3>\\(\\alpha\\) = ${roundPrecise(a1, ao)} - ${roundPrecise(r1, ao)} = ${roundPrecise(a1-r1, ao)}</h3>
+                    <h3>\\(\\beta\\) = ${roundPrecise(a1, ao)} + ${roundPrecise(r1, ao)} = ${roundPrecise(a1+r1, ao)}</h3>
+                    <h3>Suma: \\(\\alpha + \\beta\\) = ${roundPrecise(B/A, ao)}</h3>
+                    <h3>Producto: \\(\\alpha\\beta\\) = ${roundPrecise(C/A, ao)}</h3>
+                `;
+            } else {
+                const ab1 = B/(2*A);
+                const rb1 = Math.abs(Math.sqrt(-D)/(2*A));
+                
+                const alf3 = `\\left(\\dfrac{${roundPrecise(B, ao)}}{${roundPrecise(2*A, ao)}}-\\dfrac{${roundPrecise(Math.sqrt(-D), ao)}i}{${roundPrecise(Math.abs(2*A), ao)}}\\right)`;
+                const bet3 = `\\left(\\dfrac{${roundPrecise(B, ao)}}{${roundPrecise(2*A, ao)}}+\\dfrac{${roundPrecise(Math.sqrt(-D), ao)}i}{${roundPrecise(Math.abs(2*A), ao)}}\\right)`;
+                
+                const Mensaje3a = `\\(\\left(x + ${alf3}\\right)\\) \\(\\cdot\\) \\(\\left(x + ${bet3}\\right)\\) = 0`;
+                
+                procesoaj1Content = `
+                    <h2>Soluciones Complejas:</h2>
+                    <h3>Factorización: ${Mensaje3a}</h3>
+                    <h3>\\(\\alpha\\) = ${roundPrecise(ab1, ao)} - ${roundPrecise(rb1, ao)}i</h3>
+                    <h3>\\(\\beta\\) = ${roundPrecise(ab1, ao)} + ${roundPrecise(rb1, ao)}i</h3>
+                    <h3>Suma: \\(\\alpha + \\beta\\) = ${roundPrecise(B/A, ao)}</h3>
+                    <h3>Producto: \\(\\alpha\\beta\\) = ${roundPrecise(C/A, ao)}</h3>
+                `;
+            }
+            
+            document.getElementById('Procesoaj1').innerHTML = procesoaj1Content;
+            
+            // Renderizar MathJax
+            if (typeof MathJax !== 'undefined') {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            }
+            
+            // Dibujar gráfica
+            drawPlot();
+        }
+        
+        // Agregar eventos a los inputs con debounce para mejor rendimiento
+        const inputs = document.querySelectorAll('input');
+        let debounceTimer;
+        
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(renderAll, 300);
+            });
+        });
+        
+        // Renderizar inicialmente cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            renderAll();
+        });
+    </script>
+</body>
+</html>
